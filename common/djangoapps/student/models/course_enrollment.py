@@ -256,10 +256,6 @@ class CourseEnrollment(models.Model):
         on_delete=models.DO_NOTHING,
     )
 
-    @property
-    def course_price(self):
-        return get_cosmetic_verified_display_price(self.course)
-
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
