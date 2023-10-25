@@ -4,6 +4,8 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from organizations.api import get_organizations
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 # from openedx.core.lib.courses import clean_course_id
 from openedx.core.djangoapps.course_roles.models import CourseRolesUserRole
@@ -14,14 +16,17 @@ User = get_user_model()  # pylint:disable=invalid-name
 class CourseRolesUserRoleForm(forms.ModelForm):
     """Form for assigning users new roles in the Django Admin Panel"""
     email = forms.EmailField(required=True)
-    # course = forms.CharField(required=False)
-    # org = forms.CharField(required=False)
+
 
     def clean_org(self):
         """If org and course-id exists then Check organization name
         against the given course.
         """
-        if self.cleaned_data.get('course') and self.cleaned_data['org']:
+        if self.cleaned_data.get('course') is not None and self.cleaned_data['org'] is None:
+            raise forms.ValidationError(
+                "Org cannot be blank if the role is being assigned for a course."
+            )
+        elif self.cleaned_data.get('course') and self.cleaned_data['org']:
             org = self.cleaned_data['org']
             org_name = self.cleaned_data.get('course').org
             if org.name.lower() != org_name.lower():
@@ -30,11 +35,8 @@ class CourseRolesUserRoleForm(forms.ModelForm):
                         org, org_name
                     )
                 )
-        # if self.cleaned_data.get('course') and self.cleaned_data['org'] is None:
-        #     raise forms.ValidationError(
-        #         "Org cannot be blank if the role is being assigned for a course."
-        #     )
         return self.cleaned_data['org']
+
 
     def clean_email(self):
         """
@@ -52,6 +54,7 @@ class CourseRolesUserRoleForm(forms.ModelForm):
 
         return user
 
+
     def clean(self):
         """
         Check if the user is already assigned this role in the DB for the context.
@@ -59,14 +62,31 @@ class CourseRolesUserRoleForm(forms.ModelForm):
         """
         cleaned_data = super().clean()
         if not self.errors:
-            if CourseRolesUserRole.objects.filter(
-                    user=cleaned_data.get("email"),
-                    org=cleaned_data.get("org"),
-                    course=cleaned_data.get("course"),
-                    role=cleaned_data.get("role")
-            ).exists():
-                raise forms.ValidationError("Duplicate Record.")
+            if cleaned_data['course']:
+                user_role = CourseRolesUserRole.objects.filter(
+                        user=cleaned_data.get("email"),
+                        org=cleaned_data.get("org"),
+                        course=cleaned_data.get("course"),
+                        role=cleaned_data.get("role")
+                )
+            elif cleaned_data['org']:
+                user_role = CourseRolesUserRole.objects.filter(
+                        user=cleaned_data.get("email"),
+                        org=cleaned_data.get("org"),
+                        course__isnull=True,
+                        role=cleaned_data.get("role")
+                )
+            else:
+                user_role = CourseRolesUserRole.objects.filter(
+                        user=cleaned_data.get("email"),
+                        org__isnull=True,
+                        course__isnull=True,
+                        role=cleaned_data.get("role")
+                )
+            if user_role.exists():
+                    raise forms.ValidationError("Duplicate Record.")
         return cleaned_data
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -75,6 +95,7 @@ class CourseRolesUserRoleForm(forms.ModelForm):
         self.fields["course"].widget.attrs.update(style="width: 25%")
         self.fields["org"].widget.attrs.update(style="width: 25%")
         self.fields["email"].widget.attrs.update(style="width: 25%")
+
 
 @admin.register(CourseRolesUserRole)
 class CourseRolesUserRoleAdmin(admin.ModelAdmin):
