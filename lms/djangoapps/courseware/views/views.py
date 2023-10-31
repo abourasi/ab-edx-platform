@@ -2254,3 +2254,8 @@ def get_learner_username(learner_identifier):
     learner = User.objects.filter(Q(username=learner_identifier) | Q(email=learner_identifier)).first()
     if learner:
         return learner.username
+
+def set_cookie(request, referrer):
+    response = render_to_response("cm_plugin/cookie.html", {'referrer': referrer})
+    response.set_cookie(key='visited', value='true')
+    return response
