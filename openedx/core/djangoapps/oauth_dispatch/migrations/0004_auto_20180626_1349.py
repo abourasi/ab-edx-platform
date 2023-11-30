@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('organizations', '0006_auto_20171207_0259'),
         migrations.swappable_dependency(settings.OAUTH2_PROVIDER_APPLICATION_MODEL),
-        ('oauth_dispatch', '0003_application_data'),
+        ('oauth_dispatch', '0001_initial'),
     ]
 
     operations = [
@@ -33,20 +33,20 @@ class Migration(migrations.Migration):
                 ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='organizations.Organization')),
             ],
         ),
-        migrations.RemoveField(
-            model_name='scopedapplication',
-            name='user',
-        ),
-        migrations.RemoveField(
-            model_name='scopedapplicationorganization',
-            name='application',
-        ),
-        migrations.DeleteModel(
-            name='ScopedApplication',
-        ),
-        migrations.DeleteModel(
-            name='ScopedApplicationOrganization',
-        ),
+        # migrations.RemoveField(
+        #     model_name='scopedapplication',
+        #     name='user',
+        # ),
+        # migrations.RemoveField(
+        #     model_name='scopedapplicationorganization',
+        #     name='application',
+        # ),
+        # migrations.DeleteModel(
+        #     name='ScopedApplication',
+        # ),
+        # migrations.DeleteModel(
+        #     name='ScopedApplicationOrganization',
+        # ),
         migrations.AlterUniqueTogether(
             name='applicationorganization',
             unique_together={('application', 'relation_type', 'organization')},
