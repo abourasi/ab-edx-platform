@@ -13,7 +13,7 @@ import uuid
 class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     dependencies = [
-        ('student', '0021_historicalcourseenrollment'),
+        ('student', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('entitlements', '0010_backfill_refund_lock'),
     ]

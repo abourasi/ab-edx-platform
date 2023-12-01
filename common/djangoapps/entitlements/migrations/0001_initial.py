@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     dependencies = [
-        ('student', '0013_delete_historical_enrollment_records'),
+        ('student', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
