@@ -12,6 +12,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.DeleteModel(
+            name='CourseEditLTIFieldsEnabledFlag',
+        ),
+
         migrations.CreateModel(
             name='CourseEditLTIFieldsEnabledFlag',
             fields=[
