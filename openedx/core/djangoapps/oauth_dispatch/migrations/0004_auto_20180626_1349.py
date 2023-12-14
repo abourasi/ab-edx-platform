@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('organizations', '0006_auto_20171207_0259'),
         migrations.swappable_dependency(settings.OAUTH2_PROVIDER_APPLICATION_MODEL),
-        ('oauth_dispatch', '0001_initial'),
+        ('oauth_dispatch', '0003_application_data'),
     ]
 
     operations = [
